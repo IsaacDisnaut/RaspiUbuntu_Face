@@ -130,3 +130,143 @@ There is **no PIN by default**, so any paired phone can change settings. Set
 one with `SETPIN 1234`; after that, commands that change something need
 `PIN 1234` first in each session. Read-only forms (`STATUS`, `GET`, bare
 `WIFI`, bare `WEB`, `WIFI SCAN`) stay readable on a locked session.
+
+## MQTT broker and TLS certificates
+
+The browser and `deep.py` meet on an MQTT broker. Mosquitto is configured with
+three listeners ([`mosquitto/mosquitto.conf`](mosquitto/mosquitto.conf), and
+`mosquitto-local.conf` for Windows):
+
+| Port | Protocol | Used by |
+| --- | --- | --- |
+| 1883 | plain MQTT TCP | `deep.py` and other server-side clients |
+| 9001 | plain WebSocket | the Node server's `/ws/mqtt` proxy — **the normal path** |
+| 9443 | WebSocket Secure (WSS) | direct browser access on the LAN, no proxy |
+
+All three are `allow_anonymous true`, so there are no broker usernames or
+passwords to set up.
+
+### You usually do not need a certificate
+
+Port 9001 carries plain WebSocket, and the Node server proxies it at
+`/ws/mqtt` on the same origin as the web app. When you reach the app through
+the Cloudflare tunnel, Cloudflare terminates TLS, so the browser gets `wss://`
+end to end without Mosquitto holding a certificate at all. This is what
+`start-local.bat` sets up and what the web app defaults to.
+
+Certificates matter only for **port 9443** — connecting a browser straight to
+Mosquitto over the LAN, bypassing the Node server.
+
+### Generating the certificate
+
+It is generated automatically. The Node server calls `generateMqttCerts()` at
+startup ([videocall/server.js:319](videocall/server.js#L319)), which writes a
+self-signed 2048-bit RSA cert valid for 10 years to `mosquitto/certs/` and
+**skips if the files already exist**:
+
+```
+mosquitto/certs/cert.pem
+mosquitto/certs/key.pem
+```
+
+To generate them without starting the server, on Windows:
+
+```
+.\mosquitto\generate-certs.ps1
+```
+
+That script is pure PowerShell — it does not need openssl. With openssl
+available, the equivalent is:
+
+```
+openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+  -subj "/CN=localhost" \
+  -keyout mosquitto/certs/key.pem -out mosquitto/certs/cert.pem
+```
+
+`mosquitto/certs/` is gitignored — keys are never committed.
+
+### Two things that catch people out
+
+1. **`mosquitto-local.conf` has hard-coded paths.** It ships pointing at
+   `D:\CODING\For4Aug\mosquitto\certs\`. Edit `certfile` and `keyfile` to
+   your own checkout, or Mosquitto will fail to start the 9443 listener.
+2. **Browsers reject self-signed certificates.** Visit
+   `https://localhost:9443` once and click *Advanced → Proceed* before the
+   web app can open a WSS connection to it.
+
+### The Node server's own certificate is separate
+
+In development the server also self-signs an HTTPS cert into `videocall/.ssl/`
+for `https://localhost:3443`. Different file, same idea, also gitignored. With
+`NODE_ENV=production` the server serves plain HTTP on :3000 and expects
+Cloudflare, nginx or Railway to provide TLS — which is what `start-local.bat`
+does.
+
+## AI API keys (optional)
+
+Video calling and robot control need no keys at all. Without them the server
+prints `No API key …` and starts normally; only the speech-to-text and AI chat
+features return `503`. Set them up only if you want those.
+
+### The `apikey` file
+
+Create a file called `apikey` in the **project root** — not inside
+`videocall/`, since the server reads `../apikey` relative to itself
+([videocall/server.js:50](videocall/server.js#L50)). One provider per line:
+
+```
+Groq: gsk_xxxxxxxxxxxxxxxxxxxx
+Openrouter: sk-or-v1-xxxxxxxxxxxxxxxx
+Gemini: AIzaxxxxxxxxxxxxxxxxxxxx
+9arm: xxxxxxxxxxxxxxxx
+```
+
+The name before the colon is the source of truth and is case-insensitive.
+The file is gitignored.
+
+| Provider | Default model | Endpoint |
+| --- | --- | --- |
+| `groq` | `llama-3.3-70b-versatile` | `https://api.groq.com/openai/v1` |
+| `openrouter` | `qwen/qwen-2.5-72b-instruct` | `https://openrouter.ai/api/v1` |
+| `gemini` | `gemini-2.0-flash` | Google Generative Language API |
+| `9arm` | `qwen3.6-35b-a3b` | `https://gateway.9arm.co/v1` |
+
+To offer a specific set of models in the UI, follow a provider line with a
+JSON array:
+
+```
+Groq: gsk_xxxxxxxxxxxxxxxxxxxx
+[
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant"
+]
+```
+
+### Speech-to-text is Groq-only
+
+`/api/stt` posts to Groq's `whisper-large-v3-turbo` and ignores the other
+providers, so transcription needs a **Groq** key specifically even if another
+provider is set for chat.
+
+### Environment variables instead
+
+For a cloud deploy (Railway and similar), skip the file and set:
+
+```
+GROQ_API_KEY=…
+OPENROUTER_API_KEY=…
+GEMINI_API_KEY=…
+9ARM_KEY=…
+```
+
+The file wins where both are present. A single legacy `API_KEY` also works —
+the provider is sniffed from the prefix (`gsk_` → Groq, `sk-or-` → OpenRouter,
+`AIza`/`AQ.` → Gemini).
+
+### Or just type it into the UI
+
+If the server has no key, the web app's **Settings** panel shows an API-key
+field and the key is kept in that browser. When the server does have one, the
+field is hidden and the server's key is used — so an operator never handles
+the key.
