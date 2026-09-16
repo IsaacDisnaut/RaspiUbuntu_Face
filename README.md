@@ -219,7 +219,6 @@ Create a file called `apikey` in the **project root** — not inside
 Groq: gsk_xxxxxxxxxxxxxxxxxxxx
 Openrouter: sk-or-v1-xxxxxxxxxxxxxxxx
 Gemini: AIzaxxxxxxxxxxxxxxxxxxxx
-9arm: xxxxxxxxxxxxxxxx
 ```
 
 The name before the colon is the source of truth and is case-insensitive.
@@ -230,7 +229,6 @@ The file is gitignored.
 | `groq` | `llama-3.3-70b-versatile` | `https://api.groq.com/openai/v1` |
 | `openrouter` | `qwen/qwen-2.5-72b-instruct` | `https://openrouter.ai/api/v1` |
 | `gemini` | `gemini-2.0-flash` | Google Generative Language API |
-| `9arm` | `qwen3.6-35b-a3b` | `https://gateway.9arm.co/v1` |
 
 To offer a specific set of models in the UI, follow a provider line with a
 JSON array:
@@ -257,7 +255,6 @@ For a cloud deploy (Railway and similar), skip the file and set:
 GROQ_API_KEY=…
 OPENROUTER_API_KEY=…
 GEMINI_API_KEY=…
-9ARM_KEY=…
 ```
 
 The file wins where both are present. A single legacy `API_KEY` also works —
