@@ -7,6 +7,35 @@ browser while the operator drives the robot's head and arms.
 This repository holds the **web application and the robot control bridge**
 only. Internal design notes, reviews and the AI experiments are kept out.
 
+## Where to run the server
+
+**Run the server on the Windows operator PC.** That is the recommended setup
+and the one [`start-local.bat`](start-local.bat) automates end to end —
+Mosquitto, the Node server, the `deep.py` bridge, the optional YOLO detector
+and the Cloudflare tunnel, in one double-click. The Windows PC also has the
+CPU headroom for YOLO detection, which the Pi does not.
+
+The robot Pi then runs only the bridge (`deep.py`) and its own screen, and
+connects out to the operator PC's tunnel URL.
+
+```
+Windows operator PC                    Raspberry Pi (robot)
+┌────────────────────────┐             ┌──────────────────────┐
+│ Node server  :3000     │◀── tunnel ──│ deep.py  (bridge)    │
+│ Mosquitto    :1883/9001│    (MQTT    │ web_kiosk → /face    │
+│ cloudflared  (public)  │   over WSS) │ Arduino via serial   │
+└────────────────────────┘             └──────────────────────┘
+        ▲
+        └── operator's browser, and the customer's page at /face
+```
+
+Because the tunnel hostname changes every time `cloudflared` restarts, the Pi
+has to be told the new URL — which is what the [Bluetooth setup
+channel](#bluetooth-setup-channel) below is for.
+
+Ubuntu can host the server too (see [Running the server on
+Ubuntu](#running-the-server-on-ubuntu)), but Windows is the supported path.
+
 ## Pieces
 
 | Path | What it does |
@@ -57,6 +86,47 @@ python3 deep.py --set-url wss://<host>/ws/mqtt
 
 But the Pi is usually headless, which is what the Bluetooth channel below is
 for.
+
+## Running the server on Ubuntu
+
+Windows is recommended, but nothing in the server is Windows-specific — it
+runs on Ubuntu (including a Raspberry Pi 5 on arm64) if you would rather host
+it there.
+
+```
+sudo apt install -y nodejs npm mosquitto
+sudo systemctl start mosquitto
+cd videocall && npm install --omit=dev
+NODE_ENV=production PORT=3000 node server.js
+```
+
+Then expose it the same way:
+
+```
+cloudflared tunnel --url http://localhost:3000
+```
+
+On arm64, install cloudflared from the published `.deb`:
+
+```
+curl -L -o cf.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
+sudo dpkg -i cf.deb
+```
+
+There is no Linux equivalent of `start-local.bat`, so the pieces are started
+by hand. For a real deployment on a VPS with a domain, use
+[`deploy/setup.sh`](deploy/setup.sh) instead — nginx, certbot and PM2.
+
+One upside worth knowing: when the server runs on the *robot's own* Pi, the
+broker is at `localhost`, so `deep.py` never has to be told a changing tunnel
+hostname. Set it once and it stays correct:
+
+```
+python3 deep.py --set-url tcp://localhost:1883
+python3 deep.py --set-web http://localhost:3000
+```
+
+The trade-off is the missing startup script and less CPU for YOLO.
 
 ## Bluetooth setup channel
 
