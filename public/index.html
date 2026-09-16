@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoCall</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── LOGIN SCREEN ─────────────────────────────────────── -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-bg">
+      <div class="login-orb orb1"></div>
+      <div class="login-orb orb2"></div>
+      <div class="login-orb orb3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo-wrap">
+        <div class="login-logo-ring"></div>
+        <div class="login-logo-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="login-title">VideoCall</h1>
+      <p class="login-sub">Talk with AI or connect with anyone, anywhere</p>
+
+      <form id="login-form" class="login-form" novalidate>
+        <div class="login-field" id="login-field">
+          <label for="name-input" class="login-label">Your name</label>
+          <input
+            id="name-input"
+            class="login-input"
+            type="text"
+            placeholder="Enter your name…"
+            maxlength="50"
+            autocomplete="given-name"
+            spellcheck="false"
+          />
+          <span class="login-error" id="login-error"></span>
+        </div>
+        <button type="submit" class="login-btn" id="login-btn">
+          <span id="login-btn-text">Get Started</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── HEADER ─────────────────────────────────────────── -->
+  <header class="header">
+    <button class="help-btn" id="help-btn" title="Help / Tutorial">?</button>
+
+    <nav class="mode-nav">
+      <button class="mode-btn active" data-mode="ai">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+        Talk with AI
+      </button>
+      <button class="mode-btn" data-mode="person">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Talk with Person
+      </button>
+      <button class="mode-btn" data-mode="robot">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <line x1="12" y1="3" x2="12" y2="7"/>
+          <circle cx="8.5" cy="16.5" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="15.5" cy="16.5" r="1.5" fill="currentColor" stroke="none"/>
+          <line x1="6" y1="20" x2="6" y2="22"/><line x1="18" y1="20" x2="18" y2="22"/>
+        </svg>
+        Robot
+      </button>
+    </nav>
+
+    <div class="session-chip" id="session-chip" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      <span id="session-name"></span>
+      <span class="session-dot">·</span>
+      <span id="session-timer">0:00</span>
+    </div>
+
+    <button class="icon-btn" id="settings-open-btn" title="AI Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ─── MAIN ──────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ── Video Column ── -->
+    <section class="video-col">
+
+      <!-- Room controls (person mode only) -->
+      <div class="room-bar" id="room-bar" style="display:none">
+        <div class="room-create" id="room-create">
+          <span class="room-label">Your room code</span>
+          <div class="room-code-display" id="room-code-display">—</div>
+          <button class="btn-sm" id="copy-code-btn" title="Copy code">Copy</button>
+          <span class="room-sep">·</span>
+          <input id="join-input" class="room-input" type="text" placeholder="Enter code to join" maxlength="8" />
+          <button class="btn-sm primary" id="join-btn">Join</button>
+        </div>
+        <div class="room-status" id="room-status"></div>
+      </div>
+
+      <!-- AI mode tab switcher (robot model ↔ camera detect) -->
+      <div class="ai-tabs" id="ai-tabs" style="display:none">
+        <button class="ai-tab active" data-tab="robot">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="12" y1="3" x2="12" y2="7"/></svg>
+          Robot
+        </button>
+        <button class="ai-tab" data-tab="camera">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          Camera
+        </button>
+      </div>
+
+      <!-- Remote video / AI avatar -->
+      <div class="remote-wrap" id="remote-wrap">
+        <video id="remote-video" autoplay playsinline></video>
+
+        <div class="ai-avatar" id="ai-avatar">
+          <div class="ai-rings">
+            <div class="ai-ring r1"></div>
+            <div class="ai-ring r2"></div>
+            <div class="ai-ring r3"></div>
+          </div>
+          <div class="ai-face">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/>
+              <circle cx="9" cy="7" r="1" fill="currentColor" stroke="none"/>
+              <circle cx="15" cy="7" r="1" fill="currentColor" stroke="none"/>
+              <path d="M9.5 10.5 Q12 12 14.5 10.5" stroke-linecap="round"/>
+            </svg>
+            <span class="ai-label">AI</span>
+          </div>
+        </div>
+
+        <div class="remote-name" id="remote-name">AI Assistant</div>
+        <div class="speaking-badge" id="ai-speaking" style="display:none">Speaking…</div>
+      </div>
+
+      <!-- Local video (PiP) -->
+      <div class="local-wrap" id="local-wrap">
+        <video id="local-video" autoplay playsinline muted></video>
+        <canvas id="detect-canvas" class="detect-overlay" style="display:none"></canvas>
+        <div class="cam-off-placeholder" id="cam-placeholder">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <span class="local-label">You</span>
+      </div>
+
+      <!-- AI camera panel (shown on Camera tab — flex child, fills space between tabs and controls) -->
+      <div id="ai-camera-panel" style="display:none">
+        <canvas id="ai-detect-canvas"></canvas>
+        <div class="cam-off-placeholder" id="ai-cam-placeholder" style="display:none">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+          <span style="margin-top:8px;font-size:.8rem;color:var(--text-muted)">Camera off</span>
+        </div>
+      </div>
+
+      <!-- ── Robot Control Panel ── -->
+      <div id="robot-panel" class="robot-panel" style="display:none">
+
+        <!-- 3D model viewer -->
+        <div class="robot-face-wrap">
+          <canvas id="robot-canvas"></canvas>
+          <div id="robot-loading" class="robot-loading">Loading 3D model…</div>
+        </div>
+
+        <!-- Controls row: joystick | MQTT status | D-pad -->
+        <div class="robot-controls-row">
+
+          <!-- Analog joystick — eye movement -->
+          <div class="robot-ctrl-group">
+            <div class="joystick-base" id="joystick-base">
+              <div class="joystick-thumb" id="joystick-thumb"></div>
+            </div>
+            <span class="robot-ctrl-label">Eyes</span>
+          </div>
+
+          <!-- MQTT connection status -->
+          <div class="mqtt-info">
+            <div class="mqtt-status-row" id="mqtt-status-row">
+              <span class="mqtt-dot" id="mqtt-dot"></span>
+              <span class="mqtt-status-text" id="mqtt-status-text">MQTT off</span>
+            </div>
+          </div>
+
+          <!-- D-pad — head (left/right) and mouth (up/down) -->
+          <div class="robot-ctrl-group">
+            <div class="dpad">
+              <div class="dpad-row"><button class="dpad-btn" id="dpad-up" data-dir="up">▲</button></div>
+              <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-left" data-dir="left">◄</button>
+                <button class="dpad-center" id="dpad-center" title="Reset all">⦿</button>
+                <button class="dpad-btn" id="dpad-right" data-dir="right">►</button>
+              </div>
+              <div class="dpad-row"><button class="dpad-btn" id="dpad-down" data-dir="down">▼</button></div>
+            </div>
+            <span class="robot-ctrl-label">Head ◄► / Mouth ▲▼</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Control bar -->
+      <div class="controls">
+        <button class="ctrl-btn" id="mic-btn" title="Toggle microphone">
+          <svg id="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <span class="ctrl-label">Mic</span>
+        </button>
+
+        <button class="ctrl-btn" id="video-btn" title="Toggle camera">
+          <svg id="cam-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          <span class="ctrl-label">Camera</span>
+        </button>
+
+        <button class="ctrl-btn" id="speech-btn" title="Toggle speech recognition">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+            <path d="M8 11v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+          <span class="ctrl-label">Speech</span>
+        </button>
+
+        <button class="ctrl-btn" id="detect-btn" title="Toggle YOLO object detection">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="2"/>
+            <path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="ctrl-label">Detect</span>
+        </button>
+
+        <button class="ctrl-btn danger" id="end-btn" title="End call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07C9.44 17.29 7.76 15.63 6.06 13a19.5 19.5 0 0 1-3-8.5A2 2 0 0 1 5 2.5h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.98 10.25a16 16 0 0 0 1.7 3.06z"/>
+            <line x1="23" y1="1" x2="1" y2="23"/>
+          </svg>
+          <span class="ctrl-label">End</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── Chat Column ── -->
+    <section class="chat-col">
+      <div class="chat-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Chat
+        <span class="speech-indicator" id="speech-indicator" style="display:none">
+          <span class="pulse-dot"></span>Listening
+        </span>
+
+        <button class="icon-btn peer-tts-btn" id="peer-tts-btn"
+          title="Voice my messages to peer / ส่งเสียงข้อความของฉันให้คู่สนทนา">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+        </button>
+
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-welcome">
+          <p>Say hello or type a message to get started!</p>
+        </div>
+      </div>
+
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" class="chat-input" placeholder="Type a message… (Enter to send)" rows="2"></textarea>
+        <button class="send-btn" id="send-btn" title="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── HELP / TUTORIAL MODAL ───────────────────────────── -->
+  <div class="modal-overlay" id="help-overlay">
+    <div class="modal help-modal" role="dialog" aria-modal="true" aria-label="Help">
+      <div class="modal-header">
+        <h2>วิธีใช้งาน VideoCall</h2>
+        <button class="icon-btn" id="help-close-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body help-body">
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            คุยกับ AI
+          </div>
+          <p>พิมพ์หรือใช้ปุ่ม Speech เพื่อพูดคุยกับ AI เป็นภาษาไทย AI จะตอบกลับและแสดงอารมณ์ผ่านหน้าหุ่นยนต์ กด <strong>End</strong> เพื่อเริ่มบทสนทนาใหม่</p>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            คุยกับคน
+          </div>
+          <p>วิดีโอคอลกับคนอื่นแบบ peer-to-peer แชร์ <strong>รหัสห้อง</strong> หรือกรอกรหัสของอีกฝ่ายเพื่อเชื่อมต่อ</p>
+          <ul class="help-list">
+            <li>กด <strong>Copy</strong> เพื่อคัดลอกรหัสห้องของคุณแล้วส่งให้อีกฝ่าย</li>
+            <li>วางรหัสของอีกฝ่ายในช่อง Join แล้วกด <strong>Join</strong></li>
+            <li>ไอคอน <strong>🔊</strong> ในส่วนหัวแชท — ให้อีกฝ่ายได้ยินข้อความของคุณเป็นเสียงพูด</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="12" y1="3" x2="12" y2="7"/></svg>
+            โหมดหุ่นยนต์
+          </div>
+          <p>โหมดนี้ใช้ร่วมกับ <strong>คุยกับคน</strong> เท่านั้น — ฝั่งหนึ่งเปิดโหมดหุ่นยนต์เพื่อควบคุมหัวหุ่น อีกฝั่งเชื่อมเข้าห้องเดียวกันเพื่อส่งคำสั่ง</p>
+          <ul class="help-list">
+            <li><strong>จอยสติ๊ก</strong> (ซ้าย) — ลากเพื่อหมุนลูกตาซ้าย/ขวา/บน/ล่าง</li>
+            <li><strong>D-pad</strong> (ขวา) — ◄► หันหัว, ▲▼ เปิด/ปิดปาก</li>
+            <li><strong>ปุ่ม ⦿</strong> — รีเซ็ตทุกแกนกลับตำแหน่งกลาง</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M8 11v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            การพูด (STT)
+          </div>
+          <p>กดปุ่ม <strong>Speech</strong> เพื่อเริ่มฟัง ระบบจะแปลงเสียงเป็นข้อความแล้วส่งให้ AI โดยอัตโนมัติ</p>
+          <ul class="help-list">
+            <li><strong>โหมด Whisper</strong> (ค่าเริ่มต้น) — บันทึกเสียงจนเงียบแล้วส่งถอดความ หลัง AI พูดจบจะเริ่มฟังใหม่เอง</li>
+            <li><strong>โหมด Browser STT</strong> — ใช้ระบบรู้จำเสียงของเบราว์เซอร์ ทำงานต่อเนื่อง (ต้องใช้ Chrome/Edge)</li>
+            <li>เปลี่ยนโหมดได้ที่ <strong>Settings → Speech-to-Text Mode</strong></li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            เสียงตอบกลับ (TTS)
+          </div>
+          <p>คำตอบของ AI จะถูกอ่านออกเสียงอัตโนมัติผ่าน Text-to-Speech ของเบราว์เซอร์</p>
+          <ul class="help-list">
+            <li>เปิด/ปิด TTS ได้ที่ <strong>Settings → AI Voice Response</strong></li>
+            <li>ปรับความเร็วได้ที่ <strong>Voice Rate</strong> และเพศเสียงได้ที่ <strong>AI Voice Gender</strong></li>
+            <li>ทุกข้อความมีปุ่ม <strong>🔊</strong> เพื่อเปิดเสียงซ้ำได้ทุกเมื่อ</li>
+            <li>บน iOS ให้กดปุ่มใดก็ได้ก่อนเพื่อปลดล็อกเสียง</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            การตั้งค่า ⚙
+          </div>
+          <ul class="help-list">
+            <li><strong>Provider</strong> — เลือก AI ที่ต้องการใช้: Groq, OpenRouter, 9Arm, Gemini, Anthropic หรือ URL อื่น ๆ ที่รองรับ OpenAI</li>
+            <li><strong>Model</strong> — เลือกโมเดลจาก dropdown หรือพิมพ์ชื่อโมเดลเอง</li>
+            <li><strong>System Prompt</strong> — กำหนดบุคลิกของ AI ค่าเริ่มต้นทำให้ AI พูดภาษาไทยและแสดงอารมณ์ผ่านหน้าหุ่น</li>
+            <li><strong>MQTT Broker URL</strong> — URL WebSocket ของ Mosquitto broker สำหรับส่งคำสั่งไปยัง Arduino</li>
+            <li><strong>TURN servers</strong> — เพิ่ม TURN server เองหากต้องการโทรข้ามเครือข่าย</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            ปุ่มควบคุม
+          </div>
+          <ul class="help-list">
+            <li><strong>Mic</strong> — เปิด/ปิดไมโครโฟน</li>
+            <li><strong>Camera</strong> — เปิด/ปิดกล้อง</li>
+            <li><strong>Speech</strong> — เปิด/ปิดการรับรู้เสียง</li>
+            <li><strong>End</strong> — วางสาย หรือรีเซ็ตบทสนทนากับ AI</li>
+            <li><strong>🔊 (หัวแชท)</strong> — ให้อีกฝ่ายได้ยินข้อความของเราเป็นเสียงพูด</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn primary" id="help-got-it-btn">เข้าใจแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SETTINGS MODAL ─────────────────────────────────── -->
+  <div class="modal-overlay" id="settings-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="AI Settings">
+      <div class="modal-header">
+        <h2>AI Settings</h2>
+        <button class="icon-btn" id="settings-close-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <label class="field">
+          <span>Provider</span>
+          <select id="s-provider">
+            <option value="groq" selected>Groq — Llama (uses apikey file)</option>
+            <option value="openrouter">OpenRouter — Qwen 2.5 (uses apikey file)</option>
+            <option value="9arm">9Arm — Qwen3 (uses apikey file)</option>
+            <option value="openai">OpenAI / Compatible</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="gemini">Google Gemini (uses apikey file)</option>
+          </select>
+        </label>
+
+        <label class="field" id="field-baseurl">
+          <span>Base URL</span>
+          <input id="s-baseurl" type="url" placeholder="https://api.openai.com/v1" />
+        </label>
+
+        <label class="field" id="field-apikey">
+          <span>API Key</span>
+          <div class="input-group">
+            <input id="s-apikey" type="password" placeholder="sk-…" autocomplete="off" />
+            <button class="btn-sm" id="toggle-key-btn" type="button">Show</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Model</span>
+          <select id="s-model-select" style="display:none"></select>
+          <input id="s-model" type="text" placeholder="gpt-4o-mini" />
+        </label>
+
+        <label class="field">
+          <span>System Prompt</span>
+          <textarea id="s-system" rows="3" placeholder="You are a helpful assistant."></textarea>
+        </label>
+
+        <label class="field">
+          <span>Speech-to-Text Mode</span>
+          <select id="s-stt-mode">
+            <option value="whisper">Whisper (Groq) — push-to-talk, reliable</option>
+            <option value="browser">Browser STT — continuous, needs Google</option>
+          </select>
+        </label>
+
+        <label class="field row">
+          <span>AI Voice Response (TTS)</span>
+          <input id="s-tts" type="checkbox" />
+        </label>
+
+        <label class="field row" id="field-tts-rate">
+          <span>Voice Rate <span id="rate-val">1.0</span>×</span>
+          <input id="s-rate" type="range" min="0.5" max="2" step="0.1" value="1" />
+        </label>
+
+        <label class="field">
+          <span>AI Voice Gender</span>
+          <select id="s-voice-gender">
+            <option value="male" selected>Male (ชาย) — default</option>
+            <option value="female">Female (หญิง)</option>
+          </select>
+        </label>
+
+        <div class="settings-divider">MQTT (Robot Control)</div>
+
+        <label class="field">
+          <span>Broker WebSocket URL <small style="color:var(--text-muted)">(Mosquitto ws port, usually 9001)</small></span>
+          <input id="s-mqtt-url" type="text" placeholder="ws://your-broker:9001" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Topic</span>
+          <input id="s-mqtt-topic" type="text" placeholder="robot/control" />
+        </label>
+
+        <div class="settings-divider">WebRTC / TURN (optional — for cross-network calls)</div>
+
+        <label class="field">
+          <span>Custom TURN URL <small style="color:var(--text-muted)">(leave blank to use free public servers)</small></span>
+          <input id="s-turn-url" type="text" placeholder="turn:your-server.com:3478" />
+        </label>
+        <div class="field-row-2">
+          <label class="field">
+            <span>TURN Username</span>
+            <input id="s-turn-user" type="text" placeholder="username" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>TURN Credential</span>
+            <input id="s-turn-pass" type="password" placeholder="password" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn primary" id="settings-save-btn">Save Settings</button>
+        <button class="btn" id="settings-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="robot-viewer.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

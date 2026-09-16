@@ -1,0 +1,34 @@
+node_modules/
+.ssl/
+videocall.db
+videocall.db-shm
+videocall.db-wal
+.env
+*.log
+apikey
+tempCodeRunnerFile.py
+__pycache__/
+
+# heavy binaries / third-party downloads / editor config — not pushed
+*.pt
+inmoov_urdf-master/
+.vscode/
+
+# ---- not part of the published web/control code ----
+# AI experiment (Gemini) — out of scope for this repo
+api.py
+
+# internal docs, reviews and notes: README.md is the only markdown we publish
+*.md
+!README.md
+
+# screenshots / diagrams that only the internal docs used
+*.png
+
+# misc one-offs
+create_google_form.gs
+arm.urdf
+.claude/
+
+# HTML copy of the internal docs
+videocall-documentation.html

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot Face</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+    canvas { width: 100%; height: 100%; display: block; }
+    #status {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font: 11px/1 monospace;
+      color: #333;
+      pointer-events: none;
+    }
+    #status.connected { color: #1a7a3a; }
+    #status.error     { color: #7a1a1a; }
+  </style>
+</head>
+<body>
+  <canvas id="face-canvas"></canvas>
+  <div id="status">connecting…</div>
+
+  <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="/robot-viewer.js"></script>
+  <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
+  <script>
+    const BROKER = 'wss://test.mosquitto.org:8081';
+    const TOPIC  = 'robot/control';
+
+    const canvas  = document.getElementById('face-canvas');
+    const statusEl = document.getElementById('status');
+
+    let rv = null;
+    new window.RobotViewer(canvas).init().then(function (r) { rv = r; });
+
+    function applyMsg(data) {
+      if (!rv) return;
+      var headAngle = (data.Head  != null ? data.Head  : 65) - 65;
+      var mouthOpen = ((data.Mouth != null ? data.Mouth : 20) - 20) / 130;
+      var ax = data.Analog ? (data.Analog.x || 0) : 0;
+      var ay = data.Analog ? (data.Analog.y || 0) : 0;
+      rv.setJoint('i01.head.rothead_link_joint',     headAngle * Math.PI / 180);
+      rv.setJoint('i01.head.jaw_link_joint',          mouthOpen * 0.17453);
+      rv.setJoint('i01.head.eyeLeft.001_link_joint',  ax * 0.349);
+      rv.setJoint('i01.head.eyeRight.001_link_joint', ax * 0.349);
+      rv.setJoint('i01.head.eyeLeft_link_joint',      ay * 0.349);
+      rv.setJoint('i01.head.eyeRight_link_joint',     ay * 0.349);
+    }
+
+    var client = window.mqtt.connect(BROKER, { keepalive: 30, reconnectPeriod: 5000 });
+    client.on('connect', function () {
+      statusEl.textContent = 'mqtt connected';
+      statusEl.className = 'connected';
+      client.subscribe(TOPIC);
+    });
+    client.on('message', function (_, payload) {
+      try { applyMsg(JSON.parse(payload.toString())); } catch (_) {}
+    });
+    client.on('error', function () {
+      statusEl.textContent = 'mqtt error';
+      statusEl.className = 'error';
+    });
+    client.on('close', function () {
+      statusEl.textContent = 'mqtt disconnected';
+      statusEl.className = '';
+    });
+  </script>
+</body>
+</html>

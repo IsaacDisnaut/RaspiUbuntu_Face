@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<!-- Head-only assembly extracted from inmoov_urdf-master/archive/urdf/InMoov.urdf.
+     All joint origins, visual origins and mesh filenames are preserved verbatim.
+     Apply model_scale=0.1196 globally (handled in robot-viewer.js).         -->
+<robot name="inmoov_head">
+
+  <link name="base_link"/>
+
+  <!-- neck_link placed at origin; mesh vertices + visual origins are self-compensating -->
+  <joint name="base_to_neck" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="neck_link"/>
+  </joint>
+
+  <!-- ── Neck hinge ── -->
+  <link name="neck_link">
+    <visual name="nekHinge">
+      <origin rpy="0 0 0" xyz="-0.00144 -0.19608 -15.39810"/>
+      <geometry><mesh filename="/robot/meshes/Texture015.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="nekHinge.001">
+      <origin rpy="0 0 0" xyz="-0.00144 -0.19608 -15.39810"/>
+      <geometry><mesh filename="/robot/meshes/Texture083.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="nekHinge.002">
+      <origin rpy="0 0 0" xyz="-0.00144 -0.19608 -15.39810"/>
+      <geometry><mesh filename="/robot/meshes/Texture084.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="nekHinge.003">
+      <origin rpy="0 0 0" xyz="-0.00144 -0.19608 -15.39810"/>
+      <geometry><mesh filename="/robot/meshes/Texture085.stl" scale="1 1 1"/></geometry>
+    </visual>
+  </link>
+
+  <!-- ── Head rotation (left / right) ── -->
+  <joint name="i01.head.rothead_link_joint" type="revolute">
+    <limit lower="-0.78540" upper="0.78540" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 1.57080" xyz="0.00246 0.01503 0.24911"/>
+    <parent link="neck_link"/>
+    <child link="i01.head.rothead_link"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- ── Rothead (head shell — 16 material zones) ── -->
+  <link name="i01.head.rothead_link">
+    <visual name="head.full">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture013.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.001">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture068.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.002">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture069.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.003">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture070.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.004">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture071.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.005">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture072.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.006">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture073.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.007">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture074.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.008">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture075.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.009">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture076.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.010">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture077.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.011">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture078.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.012">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture079.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.013">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture080.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.014">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture081.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="head.full.015">
+      <origin rpy="0 0 -1.57080" xyz="-0.21111 0.00389 -15.64721"/>
+      <geometry><mesh filename="/robot/meshes/Texture082.stl" scale="1 1 1"/></geometry>
+    </visual>
+  </link>
+
+  <!-- ── Jaw (mouth open / close) ── -->
+  <joint name="i01.head.jaw_link_joint" type="revolute">
+    <limit lower="0" upper="0.17453" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 -1.57080" xyz="-0.36176 0.01121 0.32442"/>
+    <parent link="i01.head.rothead_link"/>
+    <child link="i01.head.jaw_link"/>
+    <axis xyz="0.99994 0 0.01111"/>
+  </joint>
+
+  <link name="i01.head.jaw_link">
+    <visual name="mouth">
+      <origin rpy="0 0 0" xyz="0.00732 0.15065 -15.97164"/>
+      <geometry><mesh filename="/robot/meshes/Texture014.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="mouth.001">
+      <origin rpy="0 0 0" xyz="0.00732 0.15065 -15.97164"/>
+      <geometry><mesh filename="/robot/meshes/Texture086.stl" scale="1 1 1"/></geometry>
+    </visual>
+    <visual name="mouth.002">
+      <origin rpy="0 0 0" xyz="0.00732 0.15065 -15.97164"/>
+      <geometry><mesh filename="/robot/meshes/Texture087.stl" scale="1 1 1"/></geometry>
+    </visual>
+  </link>
+
+  <!-- ── Left eye pan pivot ── -->
+  <joint name="i01.head.eyeLeft.001_link_joint" type="revolute">
+    <limit lower="-0.34907" upper="0.34907" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 -1.57080" xyz="-1.08601 -0.29198 0.37576"/>
+    <parent link="i01.head.rothead_link"/>
+    <child link="i01.head.eyeLeft.001_link"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="i01.head.eyeLeft.001_link"/>
+
+  <!-- ── Left eye tilt ── -->
+  <joint name="i01.head.eyeLeft_link_joint" type="revolute">
+    <limit lower="-0.78530" upper="0.78530" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 0" xyz="0 -0.00590 0"/>
+    <parent link="i01.head.eyeLeft.001_link"/>
+    <child link="i01.head.eyeLeft_link"/>
+    <axis xyz="0.99994 0 0.01111"/>
+  </joint>
+
+  <link name="i01.head.eyeLeft_link">
+    <visual name="eyeLeft.full">
+      <origin rpy="0 0 0" xyz="-0.29587 0.88079 -16.02298"/>
+      <geometry><mesh filename="/robot/meshes/Texture011.stl" scale="1 1 1"/></geometry>
+    </visual>
+  </link>
+
+  <!-- ── Right eye pan pivot ── -->
+  <joint name="i01.head.eyeRight.001_link_joint" type="revolute">
+    <limit lower="-0.34907" upper="0.34907" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 -1.57080" xyz="-1.09644 0.29850 0.37576"/>
+    <parent link="i01.head.rothead_link"/>
+    <child link="i01.head.eyeRight.001_link"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="i01.head.eyeRight.001_link"/>
+
+  <!-- ── Right eye tilt ── -->
+  <joint name="i01.head.eyeRight_link_joint" type="revolute">
+    <limit lower="-0.78530" upper="0.78530" effort="0" velocity="0.78540"/>
+    <origin rpy="0 0 0" xyz="0 -0.00590 0"/>
+    <parent link="i01.head.eyeRight.001_link"/>
+    <child link="i01.head.eyeRight_link"/>
+    <axis xyz="0.99994 0 0.01111"/>
+  </joint>
+
+  <link name="i01.head.eyeRight_link">
+    <visual name="eyeRight.full">
+      <origin rpy="0 0 0" xyz="0.29460 0.89123 -16.02297"/>
+      <geometry><mesh filename="/robot/meshes/Texture012.stl" scale="1 1 1"/></geometry>
+    </visual>
+  </link>
+
+</robot>

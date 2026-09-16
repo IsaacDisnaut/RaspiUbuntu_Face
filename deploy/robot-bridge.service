@@ -1,0 +1,32 @@
+# Installed by deploy/install-pi.sh — @USER@ and @DIR@ are substituted there.
+# Manual install: copy to /etc/systemd/system/robot-bridge.service, replace the
+# placeholders, then `sudo systemctl enable --now robot-bridge`.
+[Unit]
+Description=Avatar robot MQTT-to-Arduino bridge (deep.py) with Bluetooth config
+Documentation=file://@DIR@/RASPBERRY_PI.md
+# bluetooth.service must be up before we register the SPP profile. The network
+# only needs to be *starting* — deep.py retries the broker forever, so a Wi-Fi
+# association that finishes late (or a tunnel URL that doesn't exist yet) is
+# not a startup failure.
+After=network-online.target bluetooth.service
+Wants=network-online.target bluetooth.service
+
+[Service]
+Type=simple
+User=@USER@
+# dialout = /dev/ttyUSB*, bluetooth = BlueZ D-Bus.
+SupplementaryGroups=dialout bluetooth
+WorkingDirectory=@DIR@
+Environment=PYTHONUNBUFFERED=1
+Environment=ROBOT_BRIDGE_CONFIG=/etc/robot-bridge/config.json
+ExecStart=/usr/bin/python3 -u @DIR@/deep.py
+# The Arduino may not have enumerated yet at boot and the broker may be
+# unreachable for hours; deep.py handles both internally, so a restart here
+# only ever means an actual crash.
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

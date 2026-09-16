@@ -1,0 +1,10 @@
+node_modules/
+.ssl/
+videocall.db
+videocall.db-shm
+videocall.db-wal
+.env
+*.log
+apikey
+tempCodeRunnerFile.py
+__pycache__/

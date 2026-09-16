@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoCall</title>
+  <!-- Apply saved theme before the stylesheet loads so the page never
+       flashes the wrong theme. Light is the default. -->
+  <script>
+    try {
+      var vcTheme = JSON.parse(localStorage.getItem('vc_settings') || '{}').theme;
+      document.documentElement.dataset.theme = vcTheme === 'dark' ? 'dark' : 'light';
+    } catch (e) {
+      document.documentElement.dataset.theme = 'light';
+    }
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── LOGIN SCREEN ─────────────────────────────────────── -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-bg" aria-hidden="true">
+      <div class="login-orb orb1"></div>
+      <div class="login-orb orb2"></div>
+      <div class="login-orb orb3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo-wrap" aria-hidden="true">
+        <div class="login-logo-ring"></div>
+        <div class="login-logo-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="login-title">VideoCall</h1>
+      <p class="login-sub">เชื่อมต่อกับหุ่นยนต์เพื่อพูดคุยกับลูกค้า</p>
+
+      <form id="login-form" class="login-form" novalidate>
+        <div class="login-field" id="login-field">
+          <label for="name-input" class="login-label">ชื่อของคุณ</label>
+          <input
+            id="name-input"
+            class="login-input"
+            type="text"
+            placeholder="กรอกชื่อของคุณ…"
+            maxlength="50"
+            autocomplete="given-name"
+            spellcheck="false"
+          />
+          <span class="login-error" id="login-error" role="alert"></span>
+        </div>
+        <button type="submit" class="login-btn" id="login-btn">
+          <span id="login-btn-text">เริ่มใช้งาน</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── HEADER ─────────────────────────────────────────── -->
+  <header class="header">
+    <button class="help-btn" id="help-btn" title="วิธีใช้" aria-label="วิธีใช้">?</button>
+
+    <nav class="mode-nav">
+      <button class="mode-btn active" data-mode="ai" aria-pressed="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+        คุยกับ AI
+      </button>
+      <button class="mode-btn" data-mode="person" aria-pressed="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        คุยกับคน
+      </button>
+    </nav>
+
+    <div class="session-chip" id="session-chip" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      <span id="session-name"></span>
+      <span class="session-dot">·</span>
+      <span id="session-timer">0:00</span>
+    </div>
+
+    <button class="icon-btn" id="settings-open-btn" title="ตั้งค่า" aria-label="ตั้งค่า">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ─── MAIN ──────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ── Video Column ── -->
+    <section class="video-col">
+
+      <!-- Room controls (person mode only) -->
+      <div class="room-bar" id="room-bar" style="display:none">
+        <div class="room-create" id="room-create">
+          <span class="room-label">รหัสห้องของคุณ</span>
+          <!-- No aria-live: the code is already spoken via announceAccessibility -->
+          <div class="room-code-display" id="room-code-display" aria-label="รหัสห้อง">—</div>
+          <button class="btn-sm" id="copy-code-btn" title="คัดลอกรหัส">คัดลอก</button>
+          <span class="room-sep">·</span>
+          <input id="join-input" class="room-input" type="text" placeholder="กรอกรหัสเพื่อเข้าร่วม" maxlength="8" />
+          <button class="btn-sm primary" id="join-btn">เข้าร่วม</button>
+        </div>
+        <div class="room-status" id="room-status" aria-live="polite"></div>
+      </div>
+
+      <!-- Video/robot stage: remote video, local PiP, 3D preview, and the
+           floating mic/camera/speech/detect/end bar all anchor to this box,
+           so they stay clear of the room bar above and the person-mode
+           robot-controls bar below. -->
+      <div class="video-stage" id="video-stage">
+
+      <!-- Remote video / AI avatar -->
+      <div class="remote-wrap" id="remote-wrap">
+        <video id="remote-video" autoplay playsinline></video>
+
+        <div class="ai-avatar" id="ai-avatar" aria-hidden="true">
+          <div class="ai-rings">
+            <div class="ai-ring r1"></div>
+            <div class="ai-ring r2"></div>
+            <div class="ai-ring r3"></div>
+          </div>
+          <div class="ai-face">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/>
+              <circle cx="9" cy="7" r="1" fill="currentColor" stroke="none"/>
+              <circle cx="15" cy="7" r="1" fill="currentColor" stroke="none"/>
+              <path d="M9.5 10.5 Q12 12 14.5 10.5" stroke-linecap="round"/>
+            </svg>
+            <span class="ai-label">AI</span>
+          </div>
+        </div>
+
+        <div class="remote-name" id="remote-name">ผู้ช่วย AI</div>
+        <div class="speaking-badge" id="ai-speaking" style="display:none">กำลังพูด…</div>
+      </div>
+
+      <!-- Local video (PiP) -->
+      <div class="local-wrap" id="local-wrap">
+        <video id="local-video" autoplay playsinline muted></video>
+        <canvas id="detect-canvas" class="detect-overlay" style="display:none"></canvas>
+        <div class="cam-off-placeholder" id="cam-placeholder" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <span class="local-label">คุณ</span>
+      </div>
+
+      <!-- ── Robot 3D Preview (AI mode + /face kiosk) ── -->
+      <div id="robot-panel" class="robot-panel" style="display:none">
+        <!-- 3D model viewer -->
+        <div class="robot-face-wrap">
+          <canvas id="robot-canvas"></canvas>
+          <div id="robot-loading" class="robot-loading">กำลังโหลดโมเดล 3 มิติ…</div>
+          <div id="face-waiting-status" class="face-waiting-status" aria-live="polite">กำลังเชื่อมต่อเจ้าหน้าที่…</div>
+        </div>
+      </div>
+
+      <!-- Control bar -->
+      <div class="controls">
+        <!-- aria-pressed convention (all toggles): pressed=true = feature ON.
+             Mic/speaker/camera start ON, speech/detect start OFF. -->
+        <button class="ctrl-btn" id="mic-btn" title="ปิดไมค์" aria-label="ไมค์" aria-pressed="true">
+          <svg id="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <span class="ctrl-label">ไมค์</span>
+        </button>
+
+        <button class="ctrl-btn" id="speaker-btn" title="ปิดลำโพง" aria-label="ลำโพง" aria-pressed="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <span class="ctrl-label">ลำโพง</span>
+        </button>
+
+        <button class="ctrl-btn" id="video-btn" title="ปิดกล้อง" aria-label="กล้อง" aria-pressed="true">
+          <svg id="cam-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          <span class="ctrl-label">กล้อง</span>
+        </button>
+
+        <button class="ctrl-btn" id="speech-btn" title="พูดเป็นข้อความ" aria-label="พูดเป็นข้อความ" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+            <path d="M8 11v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+          <span class="ctrl-label">พูด</span>
+        </button>
+
+        <button class="ctrl-btn off" id="detect-btn" title="ตรวจจับวัตถุ" aria-label="ตรวจจับวัตถุ" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="2"/>
+            <path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="ctrl-label">ตรวจจับ</span>
+        </button>
+
+        <button class="ctrl-btn danger" id="end-btn" title="วางสาย" aria-label="วางสาย">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07C9.44 17.29 7.76 15.63 6.06 13a19.5 19.5 0 0 1-3-8.5A2 2 0 0 1 5 2.5h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.98 10.25a16 16 0 0 0 1.7 3.06z"/>
+            <line x1="23" y1="1" x2="1" y2="23"/>
+          </svg>
+          <span class="ctrl-label">วางสาย</span>
+        </button>
+      </div>
+
+      </div><!-- /video-stage -->
+
+      <!-- ── Robot Manual Controls (Person mode only) — joystick | MQTT status | D-pad ── -->
+      <div id="person-robot-bar" class="robot-controls-row" style="display:none">
+
+        <!-- Analog joystick — eye movement (drag, or W/A/S/D) -->
+        <div class="robot-ctrl-group">
+          <!-- ONE invisible slider covering the whole circle (merged from the
+               old left/right halves — a blind user can't aim at an invisible
+               half). A TalkBack tap anywhere on the joystick always lands on
+               this same control: swipe up/down = eyes up/down one step;
+               double-tap-and-hold then drag = full 2-axis control (pointer
+               events bubble to the base, so sighted drag is unchanged).
+               Left/right stepping lives on the sr-only ตาซ้าย/ตาขวา buttons
+               one swipe away. Static aria values by design — no position
+               speech; haptics signal movement instead. -->
+          <div class="joystick-base" id="joystick-base">
+            <div class="joystick-thumb" id="joystick-thumb" aria-hidden="true"></div>
+            <div class="joystick-stick" id="eye-stick" role="slider" tabindex="0"
+                 aria-label="ตา"
+                 aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0"
+                 aria-valuetext="ปัดขึ้นลง"></div>
+          </div>
+          <div role="group" aria-label="ควบคุมตา">
+            <button class="sr-only" id="eye-up"     aria-label="ตาขึ้น">▲</button>
+            <button class="sr-only" id="eye-left"   aria-label="ตาซ้าย">◄</button>
+            <button class="sr-only" id="eye-center" aria-label="รีเซ็ตตา">⦿</button>
+            <button class="sr-only" id="eye-right"  aria-label="ตาขวา">►</button>
+            <button class="sr-only" id="eye-down"   aria-label="ตาลง">▼</button>
+          </div>
+          <span class="robot-ctrl-label" aria-hidden="true">ลูกตา (WASD)</span>
+        </div>
+
+        <!-- MQTT connection status -->
+        <div class="mqtt-info">
+          <div class="mqtt-status-row" id="mqtt-status-row">
+            <span class="mqtt-dot" id="mqtt-dot"></span>
+            <span class="mqtt-status-text" id="mqtt-status-text">MQTT ปิด</span>
+          </div>
+        </div>
+
+        <!-- D-pad — head (left/right) and mouth (up/down), or Arrow keys -->
+        <div class="robot-ctrl-group">
+          <div class="dpad">
+            <div class="dpad-row"><button class="dpad-btn" id="dpad-up" data-dir="up" aria-label="ปิดปาก">▲</button></div>
+            <div class="dpad-row">
+              <button class="dpad-btn" id="dpad-left" data-dir="left" aria-label="หัวซ้าย">◄</button>
+              <button class="dpad-center" id="dpad-center" title="รีเซ็ตทั้งหมด (Space)" aria-label="รีเซ็ตทั้งหมด">⦿</button>
+              <button class="dpad-btn" id="dpad-right" data-dir="right" aria-label="หัวขวา">►</button>
+            </div>
+            <div class="dpad-row"><button class="dpad-btn" id="dpad-down" data-dir="down" aria-label="เปิดปาก">▼</button></div>
+          </div>
+          <span class="robot-ctrl-label" aria-hidden="true">หัว ◄► / ปาก ▲▼ (ลูกศร) — รีเซ็ต (Space)</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Chat Column ── -->
+    <section class="chat-col">
+      <div class="chat-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        แชท
+        <span class="speech-indicator" id="speech-indicator" style="display:none" aria-live="polite">
+          <span class="pulse-dot"></span>กำลังฟัง
+        </span>
+
+        <button class="icon-btn peer-tts-btn" id="peer-tts-btn"
+          title="ส่งเสียงข้อความของฉันให้อีกฝ่าย"
+          aria-label="เสียงถึงลูกค้า"
+          aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+        </button>
+        <span class="peer-tts-status" id="peer-tts-status">เสียงถึงลูกค้า: ปิด</span>
+
+      </div>
+
+      <!-- No aria-live: auto-announcing every message (AI replies, interim STT,
+           system logs) made TalkBack talk non-stop on top of the app's own TTS.
+           Messages are still readable by swiping; important ones are spoken via TTS. -->
+      <div class="chat-messages" id="chat-messages" aria-label="ข้อความในห้องสนทนา">
+        <div class="chat-welcome">
+          <p>ทักทายหรือพิมพ์ข้อความเพื่อเริ่มการสนทนา!</p>
+        </div>
+      </div>
+
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" class="chat-input" placeholder="พิมพ์ข้อความ… (กด Enter เพื่อส่ง)" rows="2"></textarea>
+        <button class="send-btn" id="send-btn" title="Send message" aria-label="ส่งข้อความ (Send message)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── HELP / TUTORIAL MODAL ───────────────────────────── -->
+  <div class="modal-overlay" id="help-overlay">
+    <div class="modal help-modal" role="dialog" aria-modal="true" aria-label="วิธีใช้">
+      <div class="modal-header">
+        <h2>วิธีใช้งาน VideoCall</h2>
+        <button class="icon-btn" id="help-close-btn" aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body help-body">
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            คุยกับคน
+          </div>
+          <p>วิดีโอคอลกับคนอื่นแบบ peer-to-peer แชร์ <strong>รหัสห้อง</strong> หรือกรอกรหัสของอีกฝ่ายเพื่อเชื่อมต่อ</p>
+          <ul class="help-list">
+            <li>กด <strong>คัดลอก</strong> เพื่อคัดลอกรหัสห้องของคุณแล้วส่งให้อีกฝ่าย</li>
+            <li>วางรหัสของอีกฝ่ายในช่องกรอกรหัส แล้วกด <strong>เข้าร่วม</strong></li>
+            <li>ไอคอน <strong>🔊</strong> ในส่วนหัวแชท — ให้อีกฝ่ายได้ยินข้อความของคุณเป็นเสียงพูด</li>
+          </ul>
+          <p>โหมดนี้ยังมี <strong>แผงควบคุมหุ่นยนต์</strong> ให้ใช้งานด้วย — ควบคุมหัวหุ่น InMoov ขณะคุยกับอีกฝ่ายที่เชื่อมต่ออยู่ในห้องเดียวกัน (เช่นจอ /face ของหุ่นยนต์)</p>
+          <ul class="help-list">
+            <li><strong>จอยสติ๊ก</strong> (ซ้าย) — ลากเพื่อหมุนลูกตาซ้าย/ขวา/บน/ล่าง</li>
+            <li><strong>D-pad</strong> (ขวา) — ◄► หันหัว, ▲ ปิดปาก ▼ เปิดปาก — กดค้างเพื่อขยับต่อเนื่อง หรือแตะสั้น ๆ เพื่อขยับทีละก้าว</li>
+            <li><strong>ปุ่ม ⦿</strong> — รีเซ็ตทุกแกนกลับตำแหน่งกลาง</li>
+            <li><strong>TalkBack / Screen reader</strong> — แตะสองครั้ง (double-tap) ที่ปุ่ม D-pad เพื่อขยับทีละก้าวใหญ่พร้อมเสียงบอกตำแหน่ง — ลูกตา: <strong>แตะจอยสติ๊กตรงไหนก็ได้หนึ่งครั้ง</strong>เพื่อโฟกัส แล้ว<strong>ปัดขึ้น/ลง</strong> = ตาขึ้น/ลงทีละ 25% ส่วนตาซ้าย/ขวาให้ปัดไปที่ปุ่ม <strong>ตาซ้าย / ตาขวา</strong> ที่อยู่ถัดจากจอย หรือ<strong>แตะสองครั้งค้างนิ้วแล้วลาก</strong>เพื่อคุมสองแกนพร้อมกัน — เมื่อเริ่มลากได้ระบบจะพูด "ควบคุมได้แล้ว" หนึ่งครั้งต่อการลาก (ไม่พูดซ้ำจนกว่าจะปล่อยนิ้วแล้วลากใหม่) — ระหว่างลากเครื่องจะ<strong>สั่นบอกแทนการพูด</strong>: สั่นสั้นทุกขั้นที่ตาขยับ สั่นยาวเมื่อสุดขอบ สั่นสองครั้งเมื่อตากลับกึ่งกลาง</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M6 7h.01M10 7h.01M14 7h.01M18 7h.01M6 11h.01M18 11h.01M8 15h8"/></svg>
+            คีย์บอร์ดควบคุม
+          </div>
+          <p>ใช้แป้นพิมพ์แทนการกดปุ่มหน้าจอได้ (ใช้งานได้เมื่อไม่ได้พิมพ์อยู่ในช่องแชทหรือช่องกรอกข้อความอื่น ๆ)</p>
+          <ul class="help-list">
+            <li><strong>ลูกศร ◄►▲▼</strong> — ควบคุม D-pad (หันหัว / เปิดปิดปาก) กดหลายทิศทางพร้อมกันได้ — ใช้ได้เฉพาะในโหมด <strong>คุยกับคน</strong></li>
+            <li><strong>Space</strong> — รีเซ็ต D-pad กลับตำแหน่งกลาง (เหมือนกดปุ่ม ⦿) — ใช้ได้เฉพาะในโหมด <strong>คุยกับคน</strong></li>
+            <li><strong>W A S D</strong> — ควบคุมจอยสติ๊ก (ลูกตาบน/ล่าง/ซ้าย/ขวา) — ใช้ได้เฉพาะในโหมด <strong>คุยกับคน</strong></li>
+            <li><strong>Alt ซ้าย</strong> — เปิด/ปิด Speech (STT) เหมือนกดปุ่ม Speech</li>
+            <li><strong>Alt ขวา</strong> — เปิด/ปิดเสียงข้อความของคุณให้คู่สนทนาฟัง (เหมือนปุ่ม 🔊 ในหัวแชท)</li>
+            <li>ขณะพิมพ์อยู่ในกล่องข้อความใด ๆ ปุ่มเหล่านี้จะไม่ทำงาน เพื่อไม่ให้รบกวนการพิมพ์</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M8 11v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            การพูด (STT)
+          </div>
+          <p>กดปุ่ม <strong>พูด</strong> เพื่อเริ่มฟัง ระบบจะแปลงเสียงเป็นข้อความแล้วส่งให้คู่สนทนาโดยอัตโนมัติ</p>
+          <ul class="help-list">
+            <li><strong>โหมด Browser STT</strong> (ค่าเริ่มต้น) — ใช้ระบบรู้จำเสียงของเบราว์เซอร์ (ผ่านบริการของ Google) ทำงานต่อเนื่อง ต้องใช้ Chrome/Edge</li>
+            <li><strong>โหมด Whisper</strong> — บันทึกเสียงจนเงียบแล้วส่งถอดความผ่าน Groq หลังพูดจบจะเริ่มฟังใหม่เอง</li>
+            <li>เปลี่ยนโหมดได้ที่ <strong>Settings → Speech-to-Text Mode</strong></li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            เสียงข้อความ (TTS)
+          </div>
+          <p>ข้อความจากคู่สนทนาจะถูกอ่านออกเสียงอัตโนมัติเมื่อเปิดใช้งาน ผ่าน Text-to-Speech ของเบราว์เซอร์</p>
+          <ul class="help-list">
+            <li>ทุกข้อความมีปุ่ม <strong>🔊</strong> เพื่อเปิดเสียงซ้ำได้ทุกเมื่อ</li>
+            <li>บน iOS ให้กดปุ่มใดก็ได้ก่อนเพื่อปลดล็อกเสียง</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            การตั้งค่า ⚙
+          </div>
+          <ul class="help-list">
+            <li><strong>MQTT Broker URL</strong> — URL WebSocket ของ Mosquitto broker สำหรับส่งคำสั่งไปยัง Arduino</li>
+            <li><strong>TURN servers</strong> — เพิ่ม TURN server เองหากต้องการโทรข้ามเครือข่าย</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <div class="help-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            ปุ่มควบคุม
+          </div>
+          <ul class="help-list">
+            <li><strong>ไมค์</strong> — เปิด/ปิดไมโครโฟน</li>
+            <li><strong>กล้อง</strong> — เปิด/ปิดกล้อง</li>
+            <li><strong>พูด</strong> — เปิด/ปิดการรับรู้เสียง</li>
+            <li><strong>วางสาย</strong> — วางสายหรือตัดการเชื่อมต่อกับคู่สนทนา</li>
+            <li><strong>🔊 (หัวแชท)</strong> — ให้อีกฝ่ายได้ยินข้อความของเราเป็นเสียงพูด</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn primary" id="help-got-it-btn">เข้าใจแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SETTINGS MODAL ─────────────────────────────────── -->
+  <div class="modal-overlay" id="settings-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="ตั้งค่า">
+      <div class="modal-header">
+        <h2>AI Settings</h2>
+        <button class="icon-btn" id="settings-close-btn" aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="settings-divider">ทั่วไป (General)</div>
+        <label class="field">
+          <span>ธีมสี (Theme)</span>
+          <select id="s-theme">
+            <option value="light" selected>สว่าง (Light)</option>
+            <option value="dark">มืด (Dark)</option>
+          </select>
+        </label>
+        <label class="field row">
+          <span>แสดงโหมด "คุยกับ AI" ในแถบเมนู <small style="color:var(--text-muted)">(ปิดไว้เพื่อให้หน้าจอเรียบง่ายสำหรับงาน operator)</small></span>
+          <input id="s-show-ai-mode" type="checkbox" />
+        </label>
+        <label class="field row">
+          <span>แสดงปุ่ม "ตรวจจับ" (YOLO) ในแถบควบคุม <small style="color:var(--text-muted)">(ฟีเจอร์เดโม/debug ปิดไว้เป็นค่าเริ่มต้น)</small></span>
+          <input id="s-show-detect-btn" type="checkbox" />
+        </label>
+        <label class="field row">
+          <span>แสดงเวลาที่ใช้ประมวลผล (timing log) ในแชท <small style="color:var(--text-muted)">(สำหรับ debug เท่านั้น)</small></span>
+          <input id="s-show-timing-log" type="checkbox" />
+        </label>
+        <label class="field">
+          <span>ความเร็วการขยับหัว/ปาก (D-pad)</span>
+          <select id="s-dpad-speed">
+            <option value="0.5">ช้า</option>
+            <option value="1" selected>ปกติ</option>
+            <option value="1.5">เร็ว</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>หมุนภาพวิดีโอที่ได้รับ <small style="color:var(--text-muted)">(กรณีกล้องอีกฝั่งติดตั้งเอียง/กลับหัว)</small></span>
+          <select id="s-remote-rotation">
+            <option value="0" selected>ไม่หมุน (0°)</option>
+            <option value="90">หมุน 90° ตามเข็ม</option>
+            <option value="180">หมุน 180° (กลับหัว)</option>
+            <option value="270">หมุน 90° ทวนเข็ม (270°)</option>
+          </select>
+        </label>
+
+        <div class="settings-divider">AI</div>
+        <label class="field">
+          <span>Provider</span>
+          <select id="s-provider">
+            <option value="groq" selected>Groq — Llama (uses apikey file)</option>
+            <option value="openrouter">OpenRouter — Qwen 2.5 (uses apikey file)</option>
+            <option value="9arm">9Arm — Qwen3 (uses apikey file)</option>
+            <option value="openai">OpenAI / Compatible</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="gemini">Google Gemini (uses apikey file)</option>
+          </select>
+        </label>
+
+        <label class="field" id="field-baseurl">
+          <span>Base URL</span>
+          <input id="s-baseurl" type="url" placeholder="https://api.openai.com/v1" />
+        </label>
+
+        <label class="field" id="field-apikey">
+          <span>API Key</span>
+          <div class="input-group">
+            <input id="s-apikey" type="password" placeholder="sk-…" autocomplete="off" />
+            <button class="btn-sm" id="toggle-key-btn" type="button">แสดง</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Model</span>
+          <select id="s-model-select" style="display:none"></select>
+          <input id="s-model" type="text" placeholder="gpt-4o-mini" />
+        </label>
+
+        <label class="field">
+          <span>System Prompt</span>
+          <textarea id="s-system" rows="3" placeholder="You are a helpful assistant."></textarea>
+        </label>
+
+        <label class="field">
+          <span>Speech-to-Text Mode</span>
+          <select id="s-stt-mode">
+            <option value="browser">Browser STT — continuous, needs Google</option>
+            <option value="whisper">Whisper (Groq) — push-to-talk, reliable</option>
+          </select>
+        </label>
+
+        <label class="field row">
+          <span>AI Voice Response (TTS)</span>
+          <input id="s-tts" type="checkbox" />
+        </label>
+
+        <label class="field row" id="field-tts-rate">
+          <span>Voice Rate <span id="rate-val">1.0</span>×</span>
+          <input id="s-rate" type="range" min="0.5" max="2" step="0.1" value="1" />
+        </label>
+
+        <div class="settings-divider">MQTT (Robot Control)</div>
+
+        <label class="field">
+          <span>Broker WebSocket URL <small style="color:var(--text-muted)">(Mosquitto ws port, usually 9001)</small></span>
+          <input id="s-mqtt-url" type="text" placeholder="ws://your-broker:9001" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Topic</span>
+          <input id="s-mqtt-topic" type="text" placeholder="robot/control" />
+        </label>
+
+        <div class="settings-divider">WebRTC / TURN (optional — for cross-network calls)</div>
+
+        <label class="field">
+          <span>Custom TURN URL <small style="color:var(--text-muted)">(leave blank to use free public servers)</small></span>
+          <input id="s-turn-url" type="text" placeholder="turn:your-server.com:3478" />
+        </label>
+        <div class="field-row-2">
+          <label class="field">
+            <span>TURN Username</span>
+            <input id="s-turn-user" type="text" placeholder="username" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>TURN Credential</span>
+            <input id="s-turn-pass" type="password" placeholder="password" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn primary" id="settings-save-btn">Save Settings</button>
+        <button class="btn" id="settings-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen-reader status line: the app writes short status text here and
+       the USER'S assistive tech (TalkBack / Narrator / NVDA) speaks it.
+       The app itself never speaks accessibility feedback via speechSynthesis
+       — that would talk over the screen reader.
+       Deliberately NO role="status": TalkBack speaks that role name aloud as
+       "สถานะ" after every announcement. A bare aria-live region announces the
+       same text with no role word. -->
+  <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <!-- Assertive twin for mid-gesture feedback ("ควบคุมได้แล้ว"): during a drag
+       TalkBack is often busy talking, and a polite message can be delayed past
+       our auto-clear and dropped — assertive speaks through. -->
+  <div id="sr-status-assertive" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="robot-viewer.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

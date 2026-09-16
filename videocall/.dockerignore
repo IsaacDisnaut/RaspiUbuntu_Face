@@ -1,0 +1,8 @@
+node_modules
+.ssl
+videocall.db
+videocall.db-shm
+videocall.db-wal
+.env
+*.log
+.git
