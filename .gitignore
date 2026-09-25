@@ -21,6 +21,7 @@ api.py
 # internal docs, reviews and notes: README.md is the only markdown we publish
 *.md
 !README.md
+!RASPBERRY_PI.md
 
 # screenshots / diagrams that only the internal docs used
 *.png
